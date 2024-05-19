@@ -1,7 +1,7 @@
 
 mysql = {
-    'host':"localhost",
-    'user':"root",
-    'password':"root",
-    'database':"datarepresentation"
+    'host':"KevDon.mysql.pythonanywhere-services.com",
+    'user':"KevDon",
+    'password':"Mfg13579!@",
+    'database':"KevDon$datarepresentation"
 }
