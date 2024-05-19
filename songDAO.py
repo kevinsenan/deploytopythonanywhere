@@ -62,6 +62,7 @@ class songDAO:
         cursor.execute(sql, values)
         self.connection.commit()
         newid = cursor.lastrowid
+        song["id"] = newid
         self.closeAll()
         return newid
 
