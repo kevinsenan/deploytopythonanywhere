@@ -108,6 +108,7 @@
         var rowElement = document.getElementById(song.id);
         updateSongAjax(song);
         setSongInRow(rowElement,song);
+        console.log(JSON.stringify(song))
         clearForm();
         showViewAll();
     }
@@ -116,6 +117,7 @@
         var rowElement = r.parentNode.parentNode;
         var index = rowElement.rowIndex;
         deleteSongAjax(rowElement.getAttribute("id"));
+        console.log(JSON.stringify(song))
         tableElement.deleteRow(index);
     }
     function addSongToTable(song){
