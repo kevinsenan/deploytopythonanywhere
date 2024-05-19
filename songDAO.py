@@ -69,7 +69,6 @@ class songDAO:
     def update(self, id, song):
         cursor = self.getcursor()
         sql="update song set Category=%s, Title=%s, Band=%s, Singer=%s, Year=%s where id = %s"
-        print(f"update music {song}")
         values = (song.get("Category"), song.get("Title"), song.get("Band"), song.get("Singer"), song.get("Year"), id)
         cursor.execute(sql, values)
         self.connection.commit()
