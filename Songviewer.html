@@ -190,7 +190,7 @@
     }
 	function getAllAjax(){
         $.ajax({
-            "url": "http://127.0.0.1:5000/Songs",
+            "url": "/Songs",
             "method":"GET",
             "data":"",
             "dataType": "JSON",
@@ -207,7 +207,7 @@
     }
 	function createMusicAjax(song){
         $.ajax({
-            "url": "http://127.0.0.1:5000/Songs",
+            "url": "/Songs",
             "method":"POST",
             "data":JSON.stringify(song),
             "dataType": "JSON",
@@ -225,7 +225,7 @@
     }
 	function updateSongAjax(song){
         $.ajax({
-            "url": "http://127.0.0.1:5000/Songs/"+encodeURI(song.id),
+            "url": "/"+encodeURI(song.id),
             "method":"PUT",
             "data":JSON.stringify(song),
             "dataType": "JSON",
@@ -240,7 +240,7 @@
     }
 	function deleteSongAjax(id){
         $.ajax({
-            "url": "http://127.0.0.1:5000/Songs/"+encodeURI(id),
+            "url": "/"+encodeURI(id),
             "method":"DELETE",
             "data":"",
             "dataType": "JSON",
