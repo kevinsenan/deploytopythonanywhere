@@ -1,0 +1,258 @@
+<!--
+# Author Kevin Donovan based on coursework from Andrew Beatty
+# Songviewer.html 
+# WSAA course project 2024-->
+
+
+<html>
+    <head>
+        <title> Music Database</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <style>
+		h1 {text-align: center;}
+		body {background-color: lightblue;}
+		p.center {text-align: center;
+			color: blue;
+			}
+		button.primary{
+			margin:30;
+			width: 100px;
+			margin-bottom: 12px;
+			background-color:blue;
+			border: 2px solid red;
+			border-radius: 5px;
+			color:white;
+			}
+        button.secondary{
+            margin:15;
+            background-color:blue;
+			border: 2px solid black;
+			border-radius: 5px;
+			color:white;
+        }
+    </style>    
+    <body>
+        <h1 style="color:#12226c;">Music I enjoy - don't judge me</h1>
+        <p class="center">I am the music man.</p>
+		<div><button class="primary" id="showCreateButton" onclick="showCreate()">Add new</button></div>
+        <div>
+            <table class="table table-bordered table hover" id="songTable">
+                <tr>
+                    <th>id</th>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Band</th>
+                    <th>Singer</th>
+                    <th>Year</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+            </table>
+        </div>
+        <div id='createUpdateForm' style="display: none">
+                <h2><span id="createLabel">Add to the</span> <span id="updateLabel">update the</span> database</h2>
+                <input type="hidden" name="id"/>
+                Category <input type="text" name="Category"/><br/>
+                Title <input type="text" name="Title"/><br/>
+                Band <input type="text" name="Band"/><br/>
+                Singer <input type="text" name="Singer"/><br/>
+                Year <input type="number" name="Year"/><br/>
+                <span><button class="secondary" id="doCreateButton" onclick="doCreate()" >Create</button></span>
+                <span><button class="secondary" id="doUpdateButton" onclick="doUpdate()" >Update</button></span>
+        </div>
+    </body>
+	<script>
+	function showCreate(){
+		document.getElementById('showCreateButton').style.display="none"
+		document.getElementById('songTable').style.display="none"
+        document.getElementById('createUpdateForm').style.display="block"
+        document.getElementById('createLabel').style.display="inline"
+        document.getElementById('updateLabel').style.display="none"
+        document.getElementById('doCreateButton').style.display="block"
+        document.getElementById('doUpdateButton').style.display="none"
+        
+	}
+	function showViewAll(){
+        document.getElementById('showCreateButton').style.display="block"
+        document.getElementById('songTable').style.display="block"
+        document.getElementById('createUpdateForm').style.display="none"        
+        
+    }
+	function showUpdate(buttonElement){
+		document.getElementById('showCreateButton').style.display="none"
+		document.getElementById("songTable").style.display = "none"
+        document.getElementById('createUpdateForm').style.display="block"
+		document.getElementById('createLabel').style.display="none"
+		document.getElementById('updateLabel').style.display="inline"
+        document.getElementById('doCreateButton').style.display="none"
+        document.getElementById('doUpdateButton').style.display="block"
+        var rowElement = buttonElement.parentNode.parentNode
+        var song = getSongFromRow(rowElement)
+        populateFormWithSong(song)
+	}
+	function doCreate(){
+        var form = document.getElementById('createUpdateForm')
+        var song = {}
+        song.Category = form.querySelector('input[name="Category"]').value
+        song.Title = form.querySelector('input[name="Title"]').value
+		song.Band = form.querySelector('input[name="Band"]').value
+        song.Singer = form.querySelector('input[name="Singer"]').value
+        song.Year = form.querySelector('input[name="Year"]').value
+        console.log(JSON.stringify(song))
+        createMusicAjax(song)
+    }
+	function doUpdate(){
+        var song = getSongFromForm();
+        var rowElement = document.getElementById(song.id);
+        updateSongAjax(song);
+        setSongInRow(rowElement,song);
+        clearForm();
+        showViewAll();
+    }
+    function doDelete(r){
+        var tableElement = document.getElementById('songTable');
+        var rowElement = r.parentNode.parentNode;
+        var index = rowElement.rowIndex;
+        deleteSongAjax(rowElement.getAttribute("id"));
+        tableElement.deleteRow(index);
+    }
+    function addSongToTable(song){
+        var tableElement = document.getElementById('songTable')
+        var rowElement = tableElement.insertRow(-1)
+        rowElement.setAttribute('id',song.id)
+        var cell1 = rowElement.insertCell(0);
+        cell1.innerHTML = song.id
+        var cell2 = rowElement.insertCell(1);
+        cell2.innerHTML = song.Category
+        var cell3 = rowElement.insertCell(2);
+        cell3.innerHTML = song.Title
+        var cell4 = rowElement.insertCell(3);
+        cell4.innerHTML = song.Band
+		var cell5 = rowElement.insertCell(4);
+        cell5.innerHTML = song.Singer
+        var cell6 = rowElement.insertCell(5);
+        cell6.innerHTML = song.Year
+        var cell7 = rowElement.insertCell(6);
+        cell7.innerHTML = '<button class="secondary" onclick=showUpdate(this)>Update</button>'
+        var cell8 = rowElement.insertCell(7);
+        cell8.innerHTML = '<button class="secondary" onclick=doDelete(this)>delete</button>'
+    }
+	function clearForm(){
+        var form = document.getElementById('createUpdateForm')
+        form.querySelector('input[name="Category"]').value=''
+        form.querySelector('input[name="Title"]').value=''
+        form.querySelector('input[name="Band"]').value=''
+		form.querySelector('input[name="Singer"]').value=''
+        form.querySelector('input[name="Year"]').value=''
+    }
+	function getSongFromRow(rowElement){
+        var song ={}
+        song.id  = rowElement.getAttribute('id')
+        song.Category = rowElement.cells[1].firstChild.textContent
+        song.Title = rowElement.cells[2].firstChild.textContent
+        song.Band = rowElement.cells[3].firstChild.textContent
+		song.Singer = rowElement.cells[4].firstChild.textContent
+        song.Year = rowElement.cells[5].firstChild.textContent
+        return song
+    }
+    function setSongInRow(rowElement, song){
+        rowElement.cells[0].firstChild.textContent= song.id  
+        rowElement.cells[1].firstChild.textContent= song.Category
+        rowElement.cells[2].firstChild.textContent= song.Title
+        rowElement.cells[3].firstChild.textContent= song.Band
+		rowElement.cells[4].firstChild.textContent= song.Singer
+        rowElement.cells[5].firstChild.textContent= song.Year
+    }
+    function populateFormWithSong(song){
+        var form = document.getElementById('createUpdateForm')
+        form.querySelector('input[name="id"]').disabled = true
+        form.querySelector('input[name="id"]').value = song.id
+        form.querySelector('input[name="Category"]').value= song.Category
+        form.querySelector('input[name="Title"]').value= song.Title
+		form.querySelector('input[name="Band"]').value= song.Band
+		form.querySelector('input[name="Singer"]').value= song.Singer
+		form.querySelector('input[name="Year"]').value= song.Year
+        return song
+    }
+    function getSongFromForm(){
+        var form = document.getElementById('createUpdateForm')
+        var song = {}
+		song.id = form.querySelector('input[name="id"]').value
+        song.Category = form.querySelector('input[name="Category"]').value
+		song.Title = form.querySelector('input[name="Title"]').value
+        song.Band = form.querySelector('input[name="Band"]').value
+        song.Singer = form.querySelector('input[name="Singer"]').value
+		song.Year = parseInt(form.querySelector('input[name="Year"]').value,10)
+        console.log(JSON.stringify(song))
+        return song
+    }
+	function getAllAjax(){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/Songs",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                //console.log(result);
+                for (song of result){
+                    addSongToTable(song);
+                }
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+	function createMusicAjax(song){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/Songs",
+            "method":"POST",
+            "data":JSON.stringify(song),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                song.id = result.id
+                addSongToTable(song)
+                clearForm()
+                showViewAll()
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+	function updateSongAjax(song){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/Songs/"+encodeURI(song.id),
+            "method":"PUT",
+            "data":JSON.stringify(song),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+
+            },
+            "error":function(xhr,status,error){
+                console.log("error:- "+status+" msg:"+error);
+            }
+        });
+    }
+	function deleteSongAjax(id){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/Songs/"+encodeURI(id),
+            "method":"DELETE",
+            "data":"",
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                //console.log(result);
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+	getAllAjax();
+	</script>
+</html>
