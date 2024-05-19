@@ -228,7 +228,7 @@
 	function updateSongAjax(song){
         $.ajax({
             "url": "/Songs"+encodeURI(song.id),
-            type: 'PUT',
+            "method":"PUT",
             "data":JSON.stringify(song),
             "dataType": "JSON",
             contentType: "application/json; charset=utf-8",
@@ -243,7 +243,7 @@
 	function deleteSongAjax(id){
         $.ajax({
             "url": "/Songs"+encodeURI(id),
-            type: 'DELETE',
+            "method":"DELETE",
             "data":"",
             "dataType": "JSON",
             contentType: "application/json; charset=utf-8",
